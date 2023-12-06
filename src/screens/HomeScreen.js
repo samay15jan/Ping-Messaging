@@ -1,13 +1,17 @@
 import React from 'react';
 import { View, Text } from 'react-native';
-import styles from './styles';
+import Styles from '../css/Styles';
 
 export default function HomeScreen() {
     return (
         <View
-            style={styles.container}
+            style={Styles.container}
         >
-            <Text>got</Text>
+            <Text
+            style={Styles.WelcomePage_Caption}
+	    >
+	    HomeScreen
+	    </Text>
         </View>
     )
 }

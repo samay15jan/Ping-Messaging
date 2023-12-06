@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Text, Pressable, View, Button, TextInput } from 'react-native';
-import { auth } from '../config/firebase';
+import { auth, database } from '../config/firebase';
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import styles from './styles';
+import { ref, set } from "firebase/database";
+import Styles from '../css/Styles';
 
-const AuthScreen = ({ navigation }) => {
+const AuthScreen = () => {
+  const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [signin, setshowsign] = useState(null);
@@ -13,13 +15,16 @@ const AuthScreen = ({ navigation }) => {
     try {
       createUserWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
-          // Signed up 
-          const user = userCredential.user;
-          console.log("account created")
+          // Signed up successful
+          const userId = userCredential.user;
+          set(ref(database, 'users/' + username), {
+            id: userId,
+            email: email,
+          });
         })
       setshowsign(true)
     } catch (error) {
-      console.error(error);
+      console.error("An error occured ", error);
     }
   };
   const handleSignIn = async () => {
@@ -28,21 +33,22 @@ const AuthScreen = ({ navigation }) => {
         .then((userCredential) => {
           // Signed up 
           const user = userCredential.user;
-          console.log("signed in ")
         })
     } catch (error) {
-      console.error(error);
+      console.error("An error occured ", error);
     }
   };
 
   if (!signin) {
     return (
       <View
-        style={styles.container}
+        
       >
+        <TextInput value={username} onChangeText={text => setUsername(text)} />
         <TextInput value={email} onChangeText={text => setEmail(text)} />
         <TextInput value={password} onChangeText={text => setPassword(text)} />
         <Pressable
+          style={Styles.WelcomePage_button}
           onPress={handleCreateAccount}
         >
           <Text>Create Account</Text>
@@ -51,10 +57,12 @@ const AuthScreen = ({ navigation }) => {
     );
   } else {
     return (
-      <View>
+      <View
+      >
         <TextInput value={email} onChangeText={text => setEmail(text)} />
         <TextInput value={password} onChangeText={text => setPassword(text)} />
         <Pressable
+          style={Styles.WelcomePage_button}
           onPress={handleSignIn}
         >
           <Text>Sign In</Text>
